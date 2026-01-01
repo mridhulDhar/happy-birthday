@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday 🎉</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: black;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      font-family: system-ui, sans-serif;
+    }
+    h1 {
+      color: white;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      text-align: center;
+      z-index: 1;
+    }
+    canvas {
+      position: fixed;
+      inset: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas></canvas>
+  <h1>🎂 Happy Birthday! 🎆</h1>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script>
+    const duration = 9000;
+    const end = Date.now() + duration;
+
+    (function frame() {
+      confetti({
+        particleCount: 8,
+        spread: 80,
+        startVelocity: 30,
+        origin: { x: Math.random(), y: Math.random() * 0.5 }
+      });
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    })();
+  </script>
+</body>
+</html>
