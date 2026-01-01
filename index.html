@@ -1,51 +1,220 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Happy Birthday 🎉</title>
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      background: black;
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      font-family: system-ui, sans-serif;
-    }
-    h1 {
-      color: white;
-      font-size: clamp(2.5rem, 6vw, 5rem);
-      text-align: center;
-      z-index: 1;
-    }
-    canvas {
-      position: fixed;
-      inset: 0;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy Birthday Divya 🎉</title>
+
+<style>
+html, body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+canvas {
+  position: fixed;
+  inset: 0;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #0b0b0b, #000 65%);
+  display: grid;
+  place-items: center;
+  z-index: 10;
+}
+
+.logo {
+  font-weight: 900;
+  letter-spacing: 0.3em;
+  font-size: clamp(48px, 10vw, 140px);
+  color: #e50914;
+  opacity: 0;
+  transform: scale(0.85);
+  text-shadow: 0 0 0 rgba(229,9,20,0);
+}
+
+.play .logo {
+  animation: reveal 1.6s ease-out forwards;
+}
+
+@keyframes reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(10px);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(0);
+    text-shadow: 0 0 35px rgba(229,9,20,0.6);
+  }
+  100% {
+    transform: scale(1);
+    text-shadow: 0 0 18px rgba(229,9,20,0.4);
+  }
+}
+
+.fade-out {
+  animation: fade 0.8s ease forwards;
+}
+
+@keyframes fade {
+  to { opacity: 0; visibility: hidden; }
+}
+
+.hint {
+  margin-top: 18px;
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  font-size: 14px;
+}
+</style>
 </head>
+
 <body>
-  <canvas></canvas>
-  <h1>🎂 Happy Birthday! 🎆</h1>
+<canvas id="c"></canvas>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-  <script>
-    const duration = 9000;
-    const end = Date.now() + duration;
+<div class="intro" id="intro">
+  <div>
+    <div class="logo">DIVYA</div>
+    <div class="hint">Tap / click to start 🎂</div>
+  </div>
+</div>
 
-    (function frame() {
-      confetti({
-        particleCount: 8,
-        spread: 80,
-        startVelocity: 30,
-        origin: { x: Math.random(), y: Math.random() * 0.5 }
-      });
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    })();
-  </script>
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const intro = document.getElementById("intro");
+const logo = document.querySelector(".logo");
+
+let W, H;
+function resize() {
+  W = canvas.width = innerWidth;
+  H = canvas.height = innerHeight;
+}
+addEventListener("resize", resize);
+resize();
+
+// ---- Sound (Netflix-style boom, no file needed)
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioCtx();
+
+function playBoom() {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+
+  o.type = "sine";
+  o.frequency.setValueAtTime(120, audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.7);
+
+  g.gain.setValueAtTime(0.9, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+
+  o.connect(g);
+  g.connect(audioCtx.destination);
+
+  o.start();
+  o.stop(audioCtx.currentTime + 0.8);
+}
+
+// ---- Particles
+const particles = [];
+function rand(a,b){ return Math.random()*(b-a)+a; }
+
+function firework(x,y){
+  for(let i=0;i<80;i++){
+    const a = rand(0,Math.PI*2);
+    const s = rand(2,7);
+    particles.push({
+      x,y,
+      vx: Math.cos(a)*s,
+      vy: Math.sin(a)*s,
+      life: rand(40,70),
+      hue: rand(0,360)
+    });
+  }
+}
+
+function heart(x,y){
+  for(let i=0;i<24;i++){
+    particles.push({
+      x: x+rand(-10,10),
+      y: y+rand(-10,10),
+      vx: rand(-1,1),
+      vy: rand(-3,-1),
+      life: rand(60,110),
+      size: rand(8,14),
+      rot: rand(-0.6,0.6)
+    });
+  }
+}
+
+let mode = "fireworks";
+
+function draw(){
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.fillRect(0,0,W,H);
+
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.life--;
+
+    if(p.size){
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.04;
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.globalAlpha = p.life/110;
+      ctx.fillStyle = "#ff4d88";
+      ctx.beginPath();
+      ctx.moveTo(0,-p.size/4);
+      ctx.bezierCurveTo(p.size/2,-p.size,p.size*1.2,-p.size/6,0,p.size);
+      ctx.bezierCurveTo(-p.size*1.2,-p.size/6,-p.size/2,-p.size,0,-p.size/4);
+      ctx.fill();
+      ctx.restore();
+    } else {
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.1;
+      ctx.fillStyle = `hsl(${p.hue},100%,60%)`;
+      ctx.globalAlpha = p.life/70;
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,2,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    if(p.life<=0) particles.splice(i,1);
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ---- Interactions
+intro.addEventListener("click", () => {
+  audioCtx.resume();
+  playBoom();
+  intro.classList.add("play");
+  firework(W/2,H/2);
+
+  setTimeout(()=>intro.classList.add("fade-out"),1600);
+  setTimeout(()=>intro.remove(),2400);
+});
+
+addEventListener("click",(e)=>{
+  if(document.getElementById("intro")) return;
+  if(mode==="fireworks") firework(e.clientX,e.clientY);
+  else heart(e.clientX,e.clientY);
+});
+
+addEventListener("contextmenu",(e)=>{
+  e.preventDefault();
+  mode = mode==="fireworks" ? "hearts" : "fireworks";
+});
+</script>
 </body>
 </html>
