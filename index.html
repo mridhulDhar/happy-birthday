@@ -14,7 +14,7 @@
     html,body{height:100%; margin:0; background:var(--bg); overflow:hidden; font-family: Arial, Helvetica, sans-serif;}
     canvas{position:fixed; inset:0; width:100%; height:100%; display:block;}
 
-    /* Main text (HIDDEN until intro ends) */
+    /* Main text (hidden until intro ends) */
     .wrap{
       position:fixed; inset:0;
       display:flex; flex-direction:column;
@@ -23,7 +23,7 @@
       pointer-events:none;
       padding:20px;
       opacity:0;
-      transform: translateY(8px);
+      transform: translateY(10px);
       transition: opacity 700ms ease, transform 700ms ease;
       z-index:2;
     }
@@ -35,20 +35,23 @@
     .title{
       color:var(--white);
       font-weight:900;
-      letter-spacing:0.10em;
+      letter-spacing:0.08em;
       font-size: clamp(28px, 5vw, 64px);
       text-transform:uppercase;
       margin:0 0 10px;
       text-shadow: 0 2px 30px rgba(255,255,255,0.08);
     }
+
     .name{
       color:var(--red);
       font-weight:900;
-      font-size: clamp(44px, 8vw, 120px);
+      font-size: clamp(44px, 8vw, 110px);
       letter-spacing:0.10em;
       margin:0;
+      text-transform:uppercase;
       text-shadow: 0 0 18px rgba(229,9,20,0.35);
     }
+
     .hint{
       margin-top:16px;
       color:rgba(255,255,255,0.6);
@@ -61,80 +64,66 @@
     .intro{
       position:fixed; inset:0;
       display:flex; align-items:center; justify-content:center;
-      background: radial-gradient(circle at center, rgba(229,9,20,0.10), rgba(0,0,0,0.96) 70%);
+      background: radial-gradient(circle at center, rgba(229,9,20,0.10), rgba(0,0,0,0.96) 65%);
       z-index:5;
     }
-    .intro.hidden{
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 800ms ease;
-    }
+    .intro.hidden{opacity:0; pointer-events:none; transition:opacity 700ms ease;}
 
     .letterBox{
       position:relative;
-      width:min(65vmin, 520px);
-      height:min(65vmin, 520px);
+      width:min(62vmin, 460px);
+      height:min(62vmin, 460px);
       display:grid;
       place-items:center;
-      filter: drop-shadow(0 0 28px rgba(229,9,20,0.25));
+      filter: drop-shadow(0 0 18px rgba(229,9,20,0.25));
     }
 
     /* Big D */
     .bigLetter{
-      font-size: min(48vmin, 380px);
+      font-size: min(46vmin, 360px);
       font-weight:900;
-      color: transparent;
-      -webkit-text-stroke: 5px rgba(229,9,20,0.55);
+      color:transparent;
+      -webkit-text-stroke: 4px rgba(229,9,20,0.45);
       text-shadow:
-        0 0 26px rgba(229,9,20,0.35),
-        0 0 70px rgba(229,9,20,0.16);
+        0 0 24px rgba(229,9,20,0.35),
+        0 0 60px rgba(229,9,20,0.20);
       transform: scale(0.92);
       opacity:0;
     }
 
-    /* Netflix-ish sweeping light (single bright beam + glow) */
-    .beam{
+    /* Light sweep streaks (only inside the intro) */
+    .streaks{
+      position:absolute; inset:-10%;
+      overflow:hidden;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
+              mask-image: linear-gradient(to right, transparent 0%, black 18%, black 82%, transparent 100%);
+      pointer-events:none;
+    }
+    .streak{
       position:absolute;
-      inset:-20%;
-      background: linear-gradient(
-        90deg,
-        rgba(0,0,0,0) 0%,
-        rgba(229,9,20,0.0) 38%,
-        rgba(255,60,80,0.85) 50%,
-        rgba(229,9,20,0.0) 62%,
-        rgba(0,0,0,0) 100%
+      top:-25%;
+      width: 10px;
+      height: 150%;
+      background: linear-gradient(to bottom,
+        rgba(229,9,20,0.0),
+        rgba(229,9,20,0.95),
+        rgba(229,9,20,0.0)
       );
-      transform: translateX(-130%) skewX(-14deg);
+      filter: blur(0.4px);
       opacity:0;
-      mix-blend-mode: screen;
-      filter: blur(0.8px);
-      animation: beamSweep 1250ms cubic-bezier(.2,.9,.2,1) forwards;
+      transform: translateX(-160%) skewX(-12deg);
+      animation: sweep 1050ms ease-in-out forwards;
     }
-    .glowPulse{
-      position:absolute;
-      width:70%;
-      height:70%;
-      border-radius:50%;
-      background: radial-gradient(circle, rgba(229,9,20,0.35), rgba(0,0,0,0) 60%);
-      opacity:0;
-      animation: glow 1250ms ease-out forwards;
-    }
-
-    @keyframes beamSweep{
-      0%   {opacity:0; transform: translateX(-130%) skewX(-14deg);}
-      10%  {opacity:1;}
-      80%  {opacity:1;}
-      100% {opacity:0; transform: translateX(130%) skewX(-14deg);}
-    }
-    @keyframes glow{
-      0%   {opacity:0; transform: scale(0.85);}
-      25%  {opacity:1; transform: scale(1.03);}
-      100% {opacity:0; transform: scale(1.18);}
+    @keyframes sweep{
+      0%{opacity:0; transform: translateX(-160%) skewX(-12deg);}
+      12%{opacity:1;}
+      75%{opacity:1;}
+      100%{opacity:0; transform: translateX(160%) skewX(-12deg);}
     }
 
     .reveal{
-      animation: popIn 700ms ease-out forwards;
-      animation-delay: 240ms;
+      animation: popIn 720ms ease-out forwards;
+      animation-delay: 260ms;
     }
     @keyframes popIn{
       0%{opacity:0; transform: scale(0.92);}
@@ -149,13 +138,12 @@
   <!-- Intro overlay -->
   <div class="intro" id="intro">
     <div class="letterBox">
-      <div class="glowPulse"></div>
-      <div class="beam"></div>
+      <div class="streaks" id="streaks"></div>
       <div class="bigLetter" id="bigLetter">D</div>
     </div>
   </div>
 
-  <!-- Main text (shown AFTER intro finishes) -->
+  <!-- Main text (hidden until intro ends) -->
   <div class="wrap" id="mainText" aria-hidden="true">
     <h1 class="title">HAPPY BIRTHDAY</h1>
     <h2 class="name">DIVYA</h2>
@@ -163,7 +151,7 @@
   </div>
 
   <script>
-    // ====== Tiny "boom" sound (no external files needed) ======
+    // ====== Tiny "boom" sound (WebAudio) ======
     let audioCtx = null;
     function playBoom(){
       try{
@@ -175,45 +163,60 @@
         const g1 = ctx.createGain();
         osc1.type = "sine";
         osc1.frequency.setValueAtTime(95, now);
-        osc1.frequency.exponentialRampToValueAtTime(45, now + 0.14);
+        osc1.frequency.exponentialRampToValueAtTime(45, now + 0.12);
         g1.gain.setValueAtTime(0.0001, now);
-        g1.gain.exponentialRampToValueAtTime(0.85, now + 0.02);
-        g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+        g1.gain.exponentialRampToValueAtTime(0.75, now + 0.02);
+        g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
         osc1.connect(g1).connect(ctx.destination);
         osc1.start(now);
-        osc1.stop(now + 0.26);
+        osc1.stop(now + 0.25);
 
         const osc2 = ctx.createOscillator();
         const g2 = ctx.createGain();
         osc2.type = "triangle";
-        osc2.frequency.setValueAtTime(230, now + 0.02);
-        osc2.frequency.exponentialRampToValueAtTime(140, now + 0.12);
+        osc2.frequency.setValueAtTime(240, now + 0.02);
+        osc2.frequency.exponentialRampToValueAtTime(150, now + 0.10);
         g2.gain.setValueAtTime(0.0001, now + 0.02);
-        g2.gain.exponentialRampToValueAtTime(0.28, now + 0.04);
-        g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+        g2.gain.exponentialRampToValueAtTime(0.22, now + 0.04);
+        g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
         osc2.connect(g2).connect(ctx.destination);
         osc2.start(now + 0.02);
-        osc2.stop(now + 0.18);
+        osc2.stop(now + 0.16);
       }catch(e){}
     }
 
-    // ====== Intro timing ======
+    // ====== Intro animation ======
     const intro = document.getElementById("intro");
+    const streaks = document.getElementById("streaks");
     const bigLetter = document.getElementById("bigLetter");
     const mainText = document.getElementById("mainText");
 
+    function makeStreaks(){
+      streaks.innerHTML = "";
+      const n = 18;
+      for(let i=0;i<n;i++){
+        const s = document.createElement("div");
+        s.className = "streak";
+        const left = (i/(n-1))*100;
+        const delay = (Math.random()*220)|0;
+        const dur = 820 + (Math.random()*380)|0;
+        s.style.left = `calc(${left}% - 6px)`;
+        s.style.animationDelay = `${delay}ms`;
+        s.style.animationDuration = `${dur}ms`;
+        streaks.appendChild(s);
+      }
+    }
+
     function runIntro(){
+      makeStreaks();
       bigLetter.classList.add("reveal");
       playBoom();
 
-      // when the sweep ends, fade out intro then show main text
+      // When intro finishes: hide overlay + show main text
       setTimeout(()=>{
         intro.classList.add("hidden");
-      }, 1350);
-
-      setTimeout(()=>{
-        mainText.classList.add("show"); // now "Happy Birthday Divya" appears and stays
-      }, 1500);
+        mainText.classList.add("show");
+      }, 1450);
     }
 
     // ====== Fireworks / hearts engine ======
@@ -226,6 +229,8 @@
       W = Math.floor(window.innerWidth * dpr);
       H = Math.floor(window.innerHeight * dpr);
       canvas.width = W; canvas.height = H;
+      ctx.fillStyle = "rgba(0,0,0,1)";
+      ctx.fillRect(0,0,W,H);
     }
     window.addEventListener("resize", resize);
     resize();
@@ -233,61 +238,78 @@
     const particles = [];
     function rand(a,b){ return a + Math.random()*(b-a); }
 
+    // Three firework styles so click feels "new"
     function addFirework(x,y,style=0){
-      const count = style===0 ? 140 : style===1 ? 90 : 170;
-      const speed = style===0 ? 7.1 : style===1 ? 5.6 : 7.8;
+      const count = style===0 ? 120 : style===1 ? 80 : 150;
+      const speed = style===0 ? 6.6 : style===1 ? 5.6 : 7.4;
+
       for(let i=0;i<count;i++){
-        const a = (Math.PI*2)*(i/count) + rand(-0.03,0.03);
-        const sp = speed*rand(0.55,1.20);
+        const a = (Math.PI*2)*(i/count) + rand(-0.025,0.025);
+        const sp = speed*rand(0.55,1.15);
+        let vx = Math.cos(a)*sp;
+        let vy = Math.sin(a)*sp;
+
+        // Style variations
+        if(style===1){
+          // "Palm" burst: push upwards a bit
+          vy *= rand(0.75, 1.05);
+          vx *= rand(0.85, 1.05);
+        }else if(style===2){
+          // "Ring" burst: tighter speed band
+          vx *= rand(0.9, 1.0);
+          vy *= rand(0.9, 1.0);
+        }
+
         particles.push({
-          x,y,
-          vx: Math.cos(a)*sp,
-          vy: Math.sin(a)*sp,
+          x,y,vx,vy,
           life: rand(55,105),
-          size: rand(1.1,2.6),
+          size: rand(1.2,2.6),
           kind:"spark",
-          drag: rand(0.972,0.987),
-          grav: rand(0.06,0.11),
+          drag: rand(0.970,0.988),
+          grav: rand(0.055,0.11),
           tw: rand(0.2,1.0)
         });
       }
     }
 
+    // Heart burst (parametric)
     function addHearts(x,y){
-      const count = 80;
+      const count = 74;
       for(let i=0;i<count;i++){
         const t = (Math.PI*2)*(i/count);
         const hx = 16*Math.pow(Math.sin(t),3);
         const hy = -(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
-        const scale = rand(0.24,0.46);
+        const scale = rand(0.25,0.46);
+        const vx = hx*scale*0.35 + rand(-0.8,0.8);
+        const vy = hy*scale*0.35 + rand(-0.8,0.8);
+
         particles.push({
-          x,y,
-          vx: hx*scale*0.35 + rand(-0.9,0.9),
-          vy: hy*scale*0.35 + rand(-0.9,0.9),
-          life: rand(70,125),
+          x,y,vx,vy,
+          life: rand(65,120),
           size: rand(2.0,3.6),
           kind:"heart",
-          drag: rand(0.970,0.985),
-          grav: rand(0.03,0.06),
+          drag: rand(0.970,0.986),
+          grav: rand(0.03,0.065),
           tw: rand(0.4,1.0)
         });
       }
     }
 
-    // Continuous background fireworks (always)
-    let autoTimer = 0;
-    function autoFireworks(){
-      autoTimer++;
-      if(autoTimer % 34 === 0){
-        addFirework(rand(W*0.15, W*0.85), rand(H*0.14, H*0.45), (Math.random()*3)|0);
+    // Continuous background fireworks (starts immediately, behind intro)
+    let tick = 0;
+    function autoFX(){
+      tick++;
+      if(tick % 36 === 0){
+        addFirework(rand(W*0.15, W*0.85), rand(H*0.15, H*0.45), (Math.random()*3)|0);
       }
-      if(autoTimer % 170 === 0){
-        addHearts(rand(W*0.25,W*0.75), rand(H*0.25,H*0.55));
+      if(tick % 180 === 0){
+        addHearts(rand(W*0.25,W*0.75), rand(H*0.22,H*0.55));
       }
     }
 
     function draw(){
-      ctx.fillStyle = "rgba(0,0,0,0.18)";
+      // Smooth trails (no "Netflix vertical lines" in the background)
+      ctx.fillStyle = "rgba(0,0,0,0.20)";
       ctx.fillRect(0,0,W,H);
 
       for(let i=particles.length-1;i>=0;i--){
@@ -299,11 +321,11 @@
         p.vy += p.grav*dpr;
         p.life--;
 
-        const alpha = Math.max(0, Math.min(1, p.life/105));
+        const alpha = Math.max(0, Math.min(1, p.life/100));
         const tw = 0.6 + 0.4*Math.sin((p.life*0.35) + p.tw);
 
         if(p.kind==="heart"){
-          ctx.fillStyle = `rgba(229,9,20,${0.9*alpha})`;
+          ctx.fillStyle = `rgba(229,9,20,${0.86*alpha})`;
           const s = p.size*dpr*tw;
           const x=p.x, y=p.y;
           ctx.beginPath();
@@ -312,36 +334,41 @@
           ctx.bezierCurveTo(x + 2*s, y + s*0.6, x + s, y - s, x, y);
           ctx.fill();
         }else{
-          ctx.fillStyle = `rgba(245,245,245,${0.88*alpha*tw})`;
+          ctx.fillStyle = `rgba(245,245,245,${0.86*alpha*tw})`;
           const s = p.size*dpr*tw;
           ctx.beginPath();
           ctx.arc(p.x,p.y,s,0,Math.PI*2);
           ctx.fill();
         }
 
-        if(p.life<=0 || p.x<-220 || p.x>W+220 || p.y<-220 || p.y>H+340){
+        if(p.life<=0 || p.x<-200 || p.x>W+200 || p.y<-200 || p.y>H+320){
           particles.splice(i,1);
         }
       }
 
-      autoFireworks();
+      autoFX();
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
 
-    // Click anywhere -> new burst type + boom
+    // Click anywhere → random burst type (more interactive)
     function onPointer(e){
       const rect = canvas.getBoundingClientRect();
       const x = (e.clientX - rect.left) * dpr;
       const y = (e.clientY - rect.top) * dpr;
-      if(Math.random() < 0.58) addFirework(x,y,(Math.random()*3)|0);
-      else addHearts(x,y);
+
+      const r = Math.random();
+      if(r < 0.55){
+        addFirework(x,y,(Math.random()*3)|0);
+      }else{
+        addHearts(x,y);
+      }
       playBoom();
     }
     window.addEventListener("pointerdown", onPointer, {passive:true});
 
     // Start intro after first paint
-    setTimeout(runIntro, 60);
+    setTimeout(runIntro, 80);
   </script>
 </body>
 </html>
