@@ -1,220 +1,300 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Happy Birthday Divya 🎉</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday Divya</title>
+  <style>
+    :root { --bg: #050507; --netflix-red: #E50914; }
+    html, body { height: 100%; margin: 0; background: var(--bg); overflow: hidden; font-family: Arial, Helvetica, sans-serif; }
+    canvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
-<style>
-html, body {
-  margin: 0;
-  height: 100%;
-  background: #000;
-  overflow: hidden;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-canvas {
-  position: fixed;
-  inset: 0;
-}
-
-.intro {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, #0b0b0b, #000 65%);
-  display: grid;
-  place-items: center;
-  z-index: 10;
-}
-
-.logo {
-  font-weight: 900;
-  letter-spacing: 0.3em;
-  font-size: clamp(48px, 10vw, 140px);
-  color: #e50914;
-  opacity: 0;
-  transform: scale(0.85);
-  text-shadow: 0 0 0 rgba(229,9,20,0);
-}
-
-.play .logo {
-  animation: reveal 1.6s ease-out forwards;
-}
-
-@keyframes reveal {
-  0% {
-    opacity: 0;
-    transform: scale(0.8);
-    filter: blur(10px);
-  }
-  40% {
-    opacity: 1;
-    transform: scale(1.05);
-    filter: blur(0);
-    text-shadow: 0 0 35px rgba(229,9,20,0.6);
-  }
-  100% {
-    transform: scale(1);
-    text-shadow: 0 0 18px rgba(229,9,20,0.4);
-  }
-}
-
-.fade-out {
-  animation: fade 0.8s ease forwards;
-}
-
-@keyframes fade {
-  to { opacity: 0; visibility: hidden; }
-}
-
-.hint {
-  margin-top: 18px;
-  color: rgba(255,255,255,0.7);
-  text-align: center;
-  font-size: 14px;
-}
-</style>
-</head>
-
-<body>
-<canvas id="c"></canvas>
-
-<div class="intro" id="intro">
-  <div>
-    <div class="logo">DIVYA</div>
-    <div class="hint">Tap / click to start 🎂</div>
-  </div>
-</div>
-
-<script>
-const canvas = document.getElementById("c");
-const ctx = canvas.getContext("2d");
-const intro = document.getElementById("intro");
-const logo = document.querySelector(".logo");
-
-let W, H;
-function resize() {
-  W = canvas.width = innerWidth;
-  H = canvas.height = innerHeight;
-}
-addEventListener("resize", resize);
-resize();
-
-// ---- Sound (Netflix-style boom, no file needed)
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioCtx();
-
-function playBoom() {
-  const o = audioCtx.createOscillator();
-  const g = audioCtx.createGain();
-
-  o.type = "sine";
-  o.frequency.setValueAtTime(120, audioCtx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.7);
-
-  g.gain.setValueAtTime(0.9, audioCtx.currentTime);
-  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
-
-  o.connect(g);
-  g.connect(audioCtx.destination);
-
-  o.start();
-  o.stop(audioCtx.currentTime + 0.8);
-}
-
-// ---- Particles
-const particles = [];
-function rand(a,b){ return Math.random()*(b-a)+a; }
-
-function firework(x,y){
-  for(let i=0;i<80;i++){
-    const a = rand(0,Math.PI*2);
-    const s = rand(2,7);
-    particles.push({
-      x,y,
-      vx: Math.cos(a)*s,
-      vy: Math.sin(a)*s,
-      life: rand(40,70),
-      hue: rand(0,360)
-    });
-  }
-}
-
-function heart(x,y){
-  for(let i=0;i<24;i++){
-    particles.push({
-      x: x+rand(-10,10),
-      y: y+rand(-10,10),
-      vx: rand(-1,1),
-      vy: rand(-3,-1),
-      life: rand(60,110),
-      size: rand(8,14),
-      rot: rand(-0.6,0.6)
-    });
-  }
-}
-
-let mode = "fireworks";
-
-function draw(){
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
-  ctx.fillRect(0,0,W,H);
-
-  for(let i=particles.length-1;i>=0;i--){
-    const p = particles[i];
-    p.life--;
-
-    if(p.size){
-      p.x+=p.vx; p.y+=p.vy; p.vy+=0.04;
-      ctx.save();
-      ctx.translate(p.x,p.y);
-      ctx.rotate(p.rot);
-      ctx.globalAlpha = p.life/110;
-      ctx.fillStyle = "#ff4d88";
-      ctx.beginPath();
-      ctx.moveTo(0,-p.size/4);
-      ctx.bezierCurveTo(p.size/2,-p.size,p.size*1.2,-p.size/6,0,p.size);
-      ctx.bezierCurveTo(-p.size*1.2,-p.size/6,-p.size/2,-p.size,0,-p.size/4);
-      ctx.fill();
-      ctx.restore();
-    } else {
-      p.x+=p.vx; p.y+=p.vy; p.vy+=0.1;
-      ctx.fillStyle = `hsl(${p.hue},100%,60%)`;
-      ctx.globalAlpha = p.life/70;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,2,0,Math.PI*2);
-      ctx.fill();
+    /* Center layout */
+    .wrap {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 2;
+      pointer-events: none; /* clicks go to canvas */
+      padding: 24px;
+      text-align: center;
     }
 
-    if(p.life<=0) particles.splice(i,1);
-  }
-  ctx.globalAlpha = 1;
-  requestAnimationFrame(draw);
-}
-draw();
+    /* Netflix-ish ident glow + light-beam reveal */
+    .title {
+      position: relative;
+      display: inline-block;
+      line-height: 0.95;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: white;
+      transform: translateZ(0);
+      filter: drop-shadow(0 0 18px rgba(229,9,20,0.35));
+    }
 
-// ---- Interactions
-intro.addEventListener("click", () => {
-  audioCtx.resume();
-  playBoom();
-  intro.classList.add("play");
-  firework(W/2,H/2);
+    .title .hb {
+      font-weight: 800;
+      font-size: clamp(28px, 5vw, 64px);
+      opacity: 1;
+    }
 
-  setTimeout(()=>intro.classList.add("fade-out"),1600);
-  setTimeout(()=>intro.remove(),2400);
-});
+    .title .name {
+      margin-top: 10px;
+      font-weight: 900;
+      font-size: clamp(42px, 7.2vw, 92px);
+      color: var(--netflix-red);
+      letter-spacing: 0.08em;
+      position: relative;
+      display: inline-block;
+      opacity: 1; /* stays */
+    }
 
-addEventListener("click",(e)=>{
-  if(document.getElementById("intro")) return;
-  if(mode==="fireworks") firework(e.clientX,e.clientY);
-  else heart(e.clientX,e.clientY);
-});
+    /* Light beams overlay (the “ident” feel) */
+    .beams {
+      position: absolute;
+      inset: -30% -10%;
+      z-index: -1;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      opacity: 0.95;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,0,80,0.0) 0px,
+          rgba(255,0,80,0.0) 18px,
+          rgba(255,0,80,0.35) 22px,
+          rgba(255,0,80,0.0) 30px
+        );
+      transform: perspective(700px) translateZ(0) rotateX(12deg);
+      filter: blur(1px);
+      animation: beamSweep 2.2s ease-out 1 both;
+    }
 
-addEventListener("contextmenu",(e)=>{
-  e.preventDefault();
-  mode = mode==="fireworks" ? "hearts" : "fireworks";
-});
-</script>
+    /* Reveal animation once, final state remains */
+    .reveal {
+      animation: revealPop 1.2s ease-out 1 both;
+    }
+    .name.reveal {
+      animation: revealName 1.35s ease-out 1 both;
+    }
+
+    @keyframes beamSweep {
+      0%   { transform: perspective(700px) rotateX(18deg) translateX(-18%) scaleY(0.9); opacity: 0; }
+      20%  { opacity: 1; }
+      100% { transform: perspective(700px) rotateX(12deg) translateX(12%) scaleY(1.05); opacity: 0.9; }
+    }
+
+    @keyframes revealPop {
+      0%   { transform: scale(0.92); opacity: 0; filter: blur(2px); }
+      60%  { opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes revealName {
+      0%   { transform: scale(0.86); opacity: 0; filter: blur(3px); }
+      55%  { opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Small helper hint */
+    .hint {
+      margin-top: 18px;
+      font-size: 14px;
+      opacity: 0.75;
+      color: #ddd;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fx"></canvas>
+
+  <div class="wrap" aria-hidden="true">
+    <div class="title">
+      <div class="beams"></div>
+      <div class="hb reveal">Happy Birthday</div>
+      <div class="name reveal">Divya</div>
+      <div class="hint">Click anywhere for new fireworks / hearts ✨</div>
+    </div>
+  </div>
+
+  <script>
+    // --- Canvas setup ---
+    const canvas = document.getElementById('fx');
+    const ctx = canvas.getContext('2d');
+    const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+
+    function resize() {
+      canvas.width = Math.floor(innerWidth * DPR);
+      canvas.height = Math.floor(innerHeight * DPR);
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    addEventListener('resize', resize);
+    resize();
+
+    // --- WebAudio "ta-dum" style (simple 2-note) ---
+    let audioCtx;
+    function taDum() {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
+        gain.connect(audioCtx.destination);
+
+        function tone(freq, t0, dur) {
+          const o = audioCtx.createOscillator();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, t0);
+          o.connect(gain);
+          o.start(t0);
+          o.stop(t0 + dur);
+        }
+
+        // two notes: low then higher (feel similar to a "ta-dum")
+        tone(92,  now + 0.00, 0.20);
+        tone(184, now + 0.16, 0.30);
+      } catch {}
+    }
+
+    // --- Particles ---
+    const particles = [];
+    const gravity = 0.06;
+
+    function rand(min, max) { return Math.random() * (max - min) + min; }
+
+    function addFireworkBurst(x, y, style = 'classic') {
+      const count = style === 'spark' ? 140 : 90;
+      const speed = style === 'spark' ? 4.8 : 3.8;
+
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const v = rand(speed * 0.45, speed);
+        const vx = Math.cos(a) * v;
+        const vy = Math.sin(a) * v;
+
+        particles.push({
+          type: 'spark',
+          x, y,
+          vx, vy,
+          life: style === 'spark' ? rand(55, 95) : rand(45, 80),
+          age: 0,
+          size: rand(1.0, 2.4),
+          hue: rand(0, 360),
+          drag: style === 'spark' ? 0.985 : 0.975,
+          twinkle: Math.random() < 0.22
+        });
+      }
+    }
+
+    function addHeartBurst(x, y) {
+      const count = 80;
+      for (let i = 0; i < count; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const v = rand(1.6, 4.0);
+        particles.push({
+          type: 'heart',
+          x, y,
+          vx: Math.cos(a) * v,
+          vy: Math.sin(a) * v,
+          life: rand(70, 110),
+          age: 0,
+          size: rand(10, 18),
+          hue: rand(330, 360),
+          drag: 0.985
+        });
+      }
+    }
+
+    function drawHeart(px, py, s, hue, alpha) {
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.scale(s / 18, s / 18);
+      ctx.beginPath();
+      ctx.moveTo(0, 5);
+      ctx.bezierCurveTo(0, -4, -10, -4, -10, 3);
+      ctx.bezierCurveTo(-10, 10, 0, 14, 0, 18);
+      ctx.bezierCurveTo(0, 14, 10, 10, 10, 3);
+      ctx.bezierCurveTo(10, -4, 0, -4, 0, 5);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${hue}, 90%, 60%, ${alpha})`;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function step() {
+      // fade trail
+      ctx.fillStyle = 'rgba(5,5,7,0.18)';
+      ctx.fillRect(0, 0, innerWidth, innerHeight);
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.age++;
+
+        // physics
+        p.vx *= p.drag;
+        p.vy *= p.drag;
+        p.vy += gravity;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        const t = 1 - (p.age / p.life);
+        if (t <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        if (p.type === 'spark') {
+          const alpha = p.twinkle ? (t * (0.35 + 0.65 * Math.random())) : (t);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 100%, 60%, ${alpha})`;
+          ctx.fill();
+        } else {
+          drawHeart(p.x, p.y, p.size, p.hue, t);
+        }
+      }
+
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
+    // --- Auto fireworks (continuous bursting) ---
+    function autoBurst() {
+      const x = rand(innerWidth * 0.15, innerWidth * 0.85);
+      const y = rand(innerHeight * 0.15, innerHeight * 0.55);
+      addFireworkBurst(x, y, Math.random() < 0.35 ? 'spark' : 'classic');
+    }
+    setInterval(autoBurst, 700);
+    setInterval(autoBurst, 1100);
+
+    // --- Click interaction: cycle effects ---
+    const modes = ['fireworks', 'hearts', 'spark'];
+    let modeIndex = 0;
+
+    function clickFx(e) {
+      const x = e.clientX;
+      const y = e.clientY;
+
+      // first user gesture = allow audio, play the ta-dum
+      taDum();
+
+      const mode = modes[modeIndex];
+      if (mode === 'fireworks') addFireworkBurst(x, y, 'classic');
+      if (mode === 'spark') addFireworkBurst(x, y, 'spark');
+      if (mode === 'hearts') addHeartBurst(x, y);
+
+      modeIndex = (modeIndex + 1) % modes.length;
+    }
+
+    addEventListener('pointerdown', clickFx);
+  </script>
 </body>
 </html>
